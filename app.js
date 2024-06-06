@@ -422,3 +422,26 @@ app.post('/upload_image', upload.single('upload'), (req, res) => {
 app.listen(3001, () => {
     console.log('Servidor rodando em http://localhost:3001');
 });
+
+app.get('/dbtest', (req, res) => {
+    connection.query('SELECT 1', (err, results) => {
+        if (err) {
+            console.log('Erro ao conectar ao banco de dados:', err);
+            res.status(500).send('Erro ao conectar ao banco de dados');
+        } else {
+            res.send('Conexão com banco de dados bem-sucedida');
+        }
+    });
+});
+
+app.get('/listagem', (req, res) => {
+    console.log('Rota /listagem acessada');
+    res.sendFile(path.join(__dirname, 'listagem.html'), (err) => {
+        if (err) {
+            console.log('Erro ao enviar arquivo listagem.html:', err);
+            res.status(500).send('Erro ao carregar página');
+        }
+    });
+});
+
+console.log('Variáveis de ambiente:', process.env);
