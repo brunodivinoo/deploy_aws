@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRISMA - Plataforma de Registros e Identificação de Suspeitos e Monitoramento de Atividades</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Estilos para o modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            padding-top: 0;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.9);  /* Escurece o fundo */
+        }
+        .modal-content {
+            position: relative;
+            margin: auto;
+            padding: 0;
+            width: 100%;
+            max-width: 100%;
+            height: 100%;
+        }
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            color: white;
+            font-size: 30px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .modal-images {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        .modal-images img {
+            max-width: 100%;
+            max-height: 100%;
+            display: none; /* Inicialmente, todas as imagens estão ocultas */
+        }
+        .modal-images img.active {
+            display: block; /* Apenas a imagem ativa é exibida */
+        }
+        .prev, .next {
+            position: absolute;
+            top: 50%;
+            color: white;
+            font-size: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+        }
+        .prev {
+            left: 10px;
+        }
+        .next {
+            right: 10px;
+        }
+        .prev:hover, .next:hover {
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>PRISMA - Plataforma de Registros e Identificação de Suspeitos e Monitoramento de Atividades</h1>
+        <button class="logout" onclick="location.href='/logout'">Sair</button>
+        <button id="manage-users-btn" type="button" style="display: none;" onclick="location.href='gerenciar_usuarios.html'">Gerenciar Usuários</button>
+    </header>
+    <main>
+        <button type="button" class="listagem" onclick="location.href='index.html'">Cadastrar Indivíduo</button>
+        <input type="text" id="search" placeholder="Pesquisar...">
+        <div id="individuos-container">
+            <!-- Os indivíduos serão carregados aqui pelo JavaScript -->
+        </div>
+    </main>
+
+    <!-- Modal para exibir as imagens -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <span class="prev">&#10094;</span>
+            <span class="next">&#10095;</span>
+            <div id="modal-images" class="modal-images"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2024 Sistema de Cadastro de Indivíduos. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            return new Date(dateString).toLocaleDateString('pt-BR', options);
+        }
+
+        function checkNull(value) {
+            return value || 'nada cadastrado';
+        }
+
+        // Script para carregar os indivíduos
+        fetch('/individuos')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('individuos-container');
+                data.forEach(individuo => {
+                    const card = document.createElement('div');
+                    card.classList.add('card');
+                    const imagem = individuo.imagem ? `/uploads/${individuo.imagem}` : 'placeholder.jpg';
+                    card.innerHTML = `
+                        <img src="${imagem}" alt="Foto" class="card-img" onclick="showModal(${individuo.id})">
+                        <div class="card-content">
+                            <h3>${checkNull(individuo.nome)}</h3>
+                            <p><strong>Alcunha:</strong> ${checkNull(individuo.alcunha)}</p>
+                            <p><strong>CPF:</strong> ${checkNull(individuo.cpf)}</p>
+                            <p><strong>Genitora:</strong> ${checkNull(individuo.genitora)}</p>
+                            <button onclick="editarIndividuo(${individuo.id})">Editar</button>
+                            <button onclick="excluirIndividuo(${individuo.id})">Excluir</button>
+                            <button onclick="visualizarIndividuo(${individuo.id})">Visualizar</button>
+                        </div>
+                    `;
+                    card.dataset.observacao = checkNull(individuo.observacao);
+                    container.appendChild(card);
+                });
+            });
+
+        let currentImageIndex = 0;
+
+        function showModal(individuoId) {
+            fetch(`/imagens/${individuoId}`)
+                .then(response => response.json())
+                .then(images => {
+                    const modalImages = document.getElementById('modal-images');
+                    modalImages.innerHTML = '';  // Limpa imagens anteriores
+                    images.forEach((image, index) => {
+                        const img = document.createElement('img');
+                        img.src = `/uploads/${image.imagem}`;
+                        img.alt = 'Foto';
+                        if (index === 0) {
+                            img.classList.add('active');  // Exibe a primeira imagem inicialmente
+                        }
+                        modalImages.appendChild(img);
+                    });
+                    currentImageIndex = 0;
+                    const modal = document.getElementById('myModal');
+                    modal.style.display = 'block';
+                });
+        }
+
+        function showImage(index) {
+            const images = document.querySelectorAll('.modal-images img');
+            if (index >= images.length) {
+                currentImageIndex = 0;
+            } else if (index < 0) {
+                currentImageIndex = images.length - 1;
+            } else {
+                currentImageIndex = index;
+            }
+            images.forEach(img => img.classList.remove('active'));
+            images[currentImageIndex].classList.add('active');
+        }
+
+        document.querySelector('.close').onclick = function() {
+            document.getElementById('myModal').style.display = 'none';
+        };
+
+        document.querySelector('.prev').onclick = function() {
+            showImage(currentImageIndex - 1);
+        };
+
+        document.querySelector('.next').onclick = function() {
+            showImage(currentImageIndex + 1);
+        };
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('myModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        function editarIndividuo(id) {
+            window.location.href = `/editar.html?id=${id}`;
+        }
+
+        function excluirIndividuo(id) {
+            if (confirm('Tem certeza que deseja excluir este indivíduo?')) {
+                fetch(`/excluir/${id}`, { method: 'GET' })
+                    .then(response => response.text())
+                    .then(result => {
+                        alert(result);
+                        window.location.reload();
+                    })
+                    .catch(error => console.error('Erro:', error));
+            }
+        }
+
+        function visualizarIndividuo(id) {
+            window.open(`/visualizar.html?id=${id}`, '_blank');
+        }
+
+        document.getElementById('search').addEventListener('input', function() {
+            const searchQuery = this.value.toLowerCase();
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                const nome = card.querySelector('h3').innerText.toLowerCase();
+                const alcunha = card.querySelector('p:nth-child(2)').innerText.toLowerCase();
+                const cpf = card.querySelector('p:nth-child(3)').innerText.toLowerCase();
+                const genitora = card.querySelector('p:nth-child(4)').innerText.toLowerCase();
+                const observacao = card.dataset.observacao ? card.dataset.observacao.toLowerCase() : '';
+
+                                if (nome.includes(searchQuery) || alcunha.includes(searchQuery) || cpf.includes(searchQuery) || genitora.includes(searchQuery) || observacao.includes(searchQuery)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Verificar o papel do usuário e mostrar/ocultar botões de administração
+        fetch('/current_user')
+            .then(response => response.json())
+            .then(user => {
+                if (user.role === 'admin') {
+                    document.getElementById('manage-users-btn').style.display = 'block';
+                }
+            })
+            .catch(error => console.error('Erro ao obter o usuário atual:', error));
+    </script>
+    
+</body>
+</html>
+

@@ -1,0 +1,321 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f2f2f2;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  background-color: #333;
+  color: #fff;
+  padding: 1em;
+  text-align: center;
+  position: relative;
+}
+
+header .logout {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 0.5em 1em;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+header input[type="text"] {
+  padding: 0.5em;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  margin-left: 1em;
+}
+
+main {
+  margin: 2em;
+  background-color: #fff;
+  padding: 2em;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  overflow-x: auto;
+  padding-bottom: 100px; /* Adicionado para garantir que o conteúdo não fique escondido atrás do rodapé */
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+fieldset {
+  border: 1px solid #ccc;
+  margin-bottom: 1em;
+  padding: 1em;
+  border-radius: 8px;
+}
+
+legend {
+  font-weight: bold;
+}
+
+label {
+  margin-top: 1em;
+}
+
+input, select {
+  padding: 0.5em;
+  margin-top: 0.5em;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2em;
+}
+
+button {
+  padding: 0.75em 1.5em;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button[type="submit"] {
+  background-color: #4CAF50;
+  color: white;
+}
+
+button[type="reset"] {
+  background-color: #f44336;
+  color: white;
+}
+
+button[type="button"] {
+  background-color: #008CBA;
+  color: white;
+}
+
+footer {
+  text-align: center;
+  padding: 1em;
+  background-color: #333;
+  color: #fff;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Estilos para a tabela e modal */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+table, th, td {
+  border: 1px solid #ccc;
+}
+
+th, td {
+  padding: 0.5rem;
+  text-align: left;
+}
+
+th {
+  background-color: #333;
+  color: white;
+}
+
+td img {
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+button[type="button"].listagem {
+  margin-bottom: 1rem;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  padding-top: 0;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0,0,0);
+  background-color: rgba(0,0,0,0.9);
+}
+
+.modal-content {
+  position: relative;
+  margin: auto;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+}
+
+.close {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  color: white;
+  font-size: 30px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modal-images {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.modal-images img {
+  max-width: 100%;
+  max-height: 100%;
+  display: none;
+}
+
+.modal-images img.active {
+  display: block;
+}
+
+.prev, .next {
+  position: absolute;
+  top: 50%;
+  color: white;
+  font-size: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+}
+
+.prev {
+  left: 10px;
+}
+
+.next {
+  right: 10px;
+}
+
+.prev:hover, .next:hover {
+  color: black;
+}
+
+/* Estilos específicos para a página de login */
+.login-container {
+  max-width: 400px;
+  margin: auto;
+  padding: 2em;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-container h2 {
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+.login-container label {
+  display: block;
+  margin-top: 1em;
+}
+
+.login-container input[type="text"], .login-container input[type="password"] {
+  width: 100%;
+  padding: 0.5em;
+  margin-top: 0.5em;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.login-container button[type="submit"] {
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 0.75em;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 1em;
+}
+
+.login-container button[type="submit"]:hover {
+  background-color: #45a049;
+}
+
+.logout {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 0.75em 1.5em;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 1em;
+}
+
+/* Estilos específicos para a listagem de indivíduos */
+#individuos-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+}
+
+.card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 1em;
+  width: calc(33.333% - 1em); /* Ajusta a largura para três colunas com espaçamento */
+  box-sizing: border-box;
+}
+
+.card img {
+  width: 100%;
+  height: 150px; /* Altura fixa para manter as imagens alinhadas */
+  object-fit: cover; /* Corta a imagem para caber na área */
+  border-radius: 8px;
+}
+
+.card-content {
+  margin-top: 1em;
+}
+
+.card-content h3 {
+  margin: 0 0 0.5em 0;
+}
+
+.card-content p {
+  margin: 0.5em 0;
+}
+
+.card-content button {
+  margin-top: 1em;
+  margin-right: 0.5em;
+}
+
+.icon-lupa {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}

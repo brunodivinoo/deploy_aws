@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar Indivíduo</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
+  <script src="js/scripts.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>Editar Indivíduo</h1>
+  </header>
+  <main>
+    <form id="editar-form" action="" method="post" enctype="multipart/form-data">
+      <fieldset>
+        <legend>Informações Pessoais</legend>
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" required>
+        <label for="alcunha">Alcunha:</label>
+        <input type="text" id="alcunha" name="alcunha">
+        <label for="data_nascimento">Data de Nascimento:</label>
+        <input type="date" id="data_nascimento" name="data_nascimento">
+        <label for="cpf">CPF:</label>
+        <input type="text" id="cpf" name="cpf">
+        <label for="rg">RG:</label>
+        <input type="text" id="rg" name="rg">
+        <label for="genitora">Genitora:</label>
+        <input type="text" id="genitora" name="genitora">
+        <label for="pai">Pai:</label>
+        <input type="text" id="pai" name="pai">
+        <label for="telefone">Celular:</label>
+        <input type="tel" id="telefone" name="telefone">
+        <label for="cep">CEP:</label>
+        <input type="text" id="cep" name="cep">
+      </fieldset>
+      <fieldset>
+        <legend>Endereço</legend>
+        <label for="estado">Estado:</label>
+        <input type="text" id="estado" name="estado" placeholder="Ex: SP, RJ, MG">
+        <label for="cidade">Cidade:</label>
+        <input type="text" id="cidade" name="cidade">
+        <label for="logradouro">Logradouro:</label>
+        <input type="text" id="logradouro" name="logradouro">
+        <label for="bairro">Bairro:</label>
+        <input type="text" id="bairro" name="bairro">
+      </fieldset>
+      <fieldset>
+        <legend>Geolocalização</legend>
+        <label for="latitude">Latitude:</label>
+        <input type="text" id="latitude" name="latitude">
+        <label for="longitude">Longitude:</label>
+        <input type="text" id="longitude" name="longitude">
+      </fieldset>
+      <fieldset>
+        <legend>Outras Informações</legend>
+        <label for="faccao">Facção:</label>
+        <input type="text" id="faccao" name="faccao"><br><br>
+        <label for="funcao">Função:</label>
+        <input type="text" id="funcao" name="funcao"><br><br>
+        <label for="observacao">Observação:</label>
+        <textarea id="observacao" name="observacao" rows="4" cols="50"></textarea><br><br>
+        <label for="placa_veiculo">Placa do Veículo:</label>
+        <input type="text" id="placa_veiculo" name="placa_veiculo">
+      </fieldset>
+      <fieldset>
+        <legend>Imagens Existentes</legend>
+        <div id="imagens-existentes"></div>
+      </fieldset>
+      <fieldset>
+        <legend>Adicionar Novas Imagens</legend>
+        <label for="novas_imagens">Novas Imagens:</label>
+        <input type="file" id="novas_imagens" name="novas_imagens" multiple>
+      </fieldset>
+      <div class="form-buttons">
+        <button type="submit">Salvar</button>
+        <button type="reset">Limpar</button>
+        <button type="button" onclick="location.href='listagem'">Voltar</button>
+      </div>
+    </form>
+  </main>
+  <footer>
+    <p>© 2024 Sistema de Cadastro de Indivíduos. Todos os direitos reservados.</p>
+  </footer>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      CKEDITOR.replace('observacao', {
+        extraPlugins: 'uploadimage',
+        height: 300,
+        filebrowserUploadUrl: '/upload_image',
+        filebrowserImageUploadUrl: '/upload_image'
+      });
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+
+      fetch(`/editar/${id}`)
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('nome').value = data.nome;
+          document.getElementById('alcunha').value = data.alcunha;
+          document.getElementById('data_nascimento').value = data.data_nascimento;
+          document.getElementById('cpf').value = data.cpf;
+          document.getElementById('rg').value = data.rg;
+          document.getElementById('genitora').value = data.genitora;
+          document.getElementById('pai').value = data.pai;
+          document.getElementById('telefone').value = data.telefone;
+          document.getElementById('cep').value = data.cep;
+          document.getElementById('estado').value = data.estado;
+          document.getElementById('cidade').value = data.cidade;
+          document.getElementById('logradouro').value = data.logradouro;
+          document.getElementById('bairro').value = data.bairro;
+          document.getElementById('latitude').value = data.latitude;
+          document.getElementById('longitude').value = data.longitude;
+          document.getElementById('faccao').value = data.faccao;
+          document.getElementById('funcao').value = data.funcao;
+
+          if (CKEDITOR.instances.observacao) {
+            CKEDITOR.instances.observacao.setData(data.observacao);
+          } else {
+            CKEDITOR.on('instanceReady', function() {
+              CKEDITOR.instances.observacao.setData(data.observacao);
+            });
+          }
+
+          document.getElementById('placa_veiculo').value = data.placa_veiculo;
+          document.getElementById('editar-form').action = `/editar/${id}`;
+
+          fetch(`/imagens/${id}`)
+            .then(response => response.json())
+            .then(images => {
+              const imagensExistentesDiv = document.getElementById('imagens-existentes');
+              imagensExistentesDiv.innerHTML = '';
+              images.forEach(image => {
+                const imgContainer = document.createElement('div');
+                imgContainer.style.display = 'inline-block';
+                imgContainer.style.margin = '10px';
+                imgContainer.innerHTML = `
+                  <img src="/uploads/${image.imagem}" alt="Imagem" width="100">
+                  <button type="button" onclick="excluirImagem(${image.id})">Excluir</button>
+                `;
+                imagensExistentesDiv.appendChild(imgContainer);
+              });
+            });
+        })
+        .catch(error => console.error('Erro ao carregar os dados:', error));
+    });
+
+    function excluirImagem(imagemId) {
+      const imgContainer = document.querySelector(`button[onclick="excluirImagem(${imagemId})"]`).parentElement;
+      imgContainer.remove();
+      fetch(`/excluir_imagem/${imagemId}`, { method: 'DELETE' })
+        .then(response => {
+          if (!response.ok) {
+            console.error('Erro ao excluir imagem');
+          }
+        })
+        .catch(error => console.error('Erro ao excluir imagem:', error));
+    }
+  </script>
+</body>
+</html>

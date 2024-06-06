@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Indivíduo</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .imagens-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 1em;
+        }
+        .imagens-container img {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 5px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            padding-top: 0;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.9);  /* Escurece o fundo */
+        }
+        .modal-content {
+            position: relative;
+            margin: auto;
+            padding: 0;
+            width: 100%;
+            max-width: 100%;
+            height: 100%;
+        }
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            color: white;
+            font-size: 30px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .modal-images {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        .modal-images img {
+            max-width: 100%;
+            max-height: 100%;
+            display: none; /* Inicialmente, todas as imagens estão ocultas */
+        }
+        .modal-images img.active {
+            display: block; /* Apenas a imagem ativa é exibida */
+        }
+        .prev, .next {
+            position: absolute;
+            top: 50%;
+            color: white;
+            font-size: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+        }
+        .prev {
+            left: 10px;
+        }
+        .next {
+            right: 10px;
+        }
+        .prev:hover, .next:hover {
+            color: black;
+        }
+        .observacao-container {
+            border: 2px solid #ddd; /* Cor da borda */
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            max-width: 100%;
+            overflow: auto;
+        }
+        .detalhes-item {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Detalhes do Indivíduo</h1>
+    </header>
+    <main>
+        <div id="detalhes-individuo">
+            <!-- Os detalhes do indivíduo serão carregados aqui pelo JavaScript -->
+        </div>
+        <div id="observacao-container" class="observacao-container">
+            <!-- A observação será carregada aqui pelo JavaScript -->
+        </div>
+        <div id="informacoes-adicionais">
+            <!-- Informações adicionais como placa do veículo e imagens serão carregadas aqui -->
+        </div>
+        <div>
+            <button type="button" onclick="window.close()">Fechar</button>
+            <button type="button" class="no-print" onclick="window.print()">Imprimir</button>
+        </div>
+    </main>
+
+    <!-- Modal para exibir as imagens -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <span class="prev">&#10094;</span>
+            <span class="next">&#10095;</span>
+            <div id="modal-images" class="modal-images"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2024 Sistema de Cadastro de Indivíduos. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+
+        function checkNull(value) {
+            return value || 'nada cadastrado';
+        }
+
+        fetch(`/detalhes/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                const detalhesDiv = document.getElementById('detalhes-individuo');
+                const observacaoDiv = document.getElementById('observacao-container');
+                const informacoesAdicionaisDiv = document.getElementById('informacoes-adicionais');
+                const { individuo, imagens } = data;
+
+                let detalhesHTML = `
+                    <div class="detalhes-item"><strong>Nome:</strong> ${checkNull(individuo.nome)}</div>
+                    <div class="detalhes-item"><strong>Alcunha:</strong> ${checkNull(individuo.alcunha)}</div>
+                    <div class="detalhes-item"><strong>Data de Nascimento:</strong> ${new Date(individuo.data_nascimento).toLocaleDateString('pt-BR')}</div>
+                    <div class="detalhes-item"><strong>CPF:</strong> ${checkNull(individuo.cpf)}</div>
+                    <div class="detalhes-item"><strong>RG:</strong> ${checkNull(individuo.rg)}</div>
+                    <div class="detalhes-item"><strong>Genitora:</strong> ${checkNull(individuo.genitora)}</div>
+                    <div class="detalhes-item"><strong>Pai:</strong> ${checkNull(individuo.pai)}</div>
+                    <div class="detalhes-item"><strong>Celular:</strong> ${checkNull(individuo.telefone)}</div>
+                    <div class="detalhes-item"><strong>CEP:</strong> ${checkNull(individuo.cep)}</div>
+                    <div class="detalhes-item"><strong>Estado:</strong> ${checkNull(individuo.estado)}</div>
+                    <div class="detalhes-item"><strong>Cidade:</strong> ${checkNull(individuo.cidade)}</div>
+                    <div class="detalhes-item"><strong>Logradouro:</strong> ${checkNull(individuo.logradouro)}</div>
+                    <div class="detalhes-item"><strong>Bairro:</strong> ${checkNull(individuo.bairro)}</div>
+                    <div class="detalhes-item"><strong>Latitude:</strong> ${checkNull(individuo.latitude)}</div>
+                    <div class="detalhes-item"><strong>Longitude:</strong> ${checkNull(individuo.longitude)}</div>
+                    <div class="detalhes-item"><strong>Função:</strong> ${checkNull(individuo.funcao)}</div>
+                    <div class="detalhes-item"><strong>Facção:</strong> ${checkNull(individuo.faccao)}</div>
+                `;
+
+                detalhesDiv.innerHTML = detalhesHTML;
+
+                let observacaoHTML = `
+                    <strong>Observação:</strong>
+                    <div>${individuo.observacao}</div>
+                `;
+
+                observacaoDiv.innerHTML = observacaoHTML;
+
+                let informacoesAdicionaisHTML = `
+                    <div class="detalhes-item"><strong>Placa do Veículo:</strong> ${checkNull(individuo.placa_veiculo)}</div>
+                    <h3>Imagens:</h3>
+                    <div class="imagens-container">
+                `;
+
+                imagens.forEach((image, index) => {
+                    informacoesAdicionaisHTML += `<img src="/uploads/${image.imagem}" alt="Imagem" onclick="showModal(${index})">`;
+                });
+
+                informacoesAdicionaisHTML += '</div>';
+
+                informacoesAdicionaisDiv.innerHTML = informacoesAdicionaisHTML;
+
+                // Preparando o modal com as imagens
+                const modalImagesDiv = document.getElementById('modal-images');
+                modalImagesDiv.innerHTML = imagens.map((image, index) => `
+                    <img src="/uploads/${image.imagem}" alt="Imagem" class="${index === 0 ? 'active' : ''}">
+                `).join('');
+            })
+            .catch(error => console.error('Erro:', error));
+
+        let currentImageIndex = 0;
+
+        function showModal(index) {
+            currentImageIndex = index;
+            const modal = document.getElementById('myModal');
+            const images = document.querySelectorAll('.modal-images img');
+            images.forEach(img => img.classList.remove('active'));
+            images[currentImageIndex].classList.add('active');
+            modal.style.display = 'block';
+        }
+
+                    function showImage(index) {
+                const images = document.querySelectorAll('.modal-images img');
+                if (index >= images.length) {
+                    currentImageIndex = 0;
+                } else if (index < 0) {
+                    currentImageIndex = images.length - 1;
+                } else {
+                    currentImageIndex = index;
+                }
+                images.forEach(img => img.classList.remove('active'));
+                images[currentImageIndex].classList.add('active');
+            }
+
+            document.querySelector('.close').onclick = function() {
+                document.getElementById('myModal').style.display = 'none';
+            };
+
+            document.querySelector('.prev').onclick = function() {
+                showImage(currentImageIndex - 1);
+            };
+
+            document.querySelector('.next').onclick = function() {
+                showImage(currentImageIndex + 1);
+            };
+
+            window.onclick = function(event) {
+                const modal = document.getElementById('myModal');
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            };
+        </script>
+    </body>
+</html>
